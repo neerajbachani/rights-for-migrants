@@ -1,13 +1,35 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from 'react';
 
 export function Hero() {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  
   const items = [
     "Equal Voices, Equal Rights",
     "One Voice, One Movement",
     "Empower Migrants Now",
     "Hope. Rights. Action",
-  ]
-  
+  ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      // Calculate progress from 0 to 1 based on scroll
+      const progress = Math.min(scrollPosition / (windowHeight * 0.8), 1);
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial call
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Calculate how much the bottom hand should move up
+  const bottomHandTransform = `translateY(-${scrollProgress * 300}px)`;
+  const topHandTransform = `translateY(${scrollProgress * 100}px)`;
+
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
@@ -29,26 +51,41 @@ export function Hero() {
         .tags-scroll-container:hover {
           animation-play-state: paused;
         }
+        
+        .hand-animated {
+          transition: transform 0.3s ease-out, filter 0.3s ease;
+          will-change: transform;
+        }
+        
+        .hand-glow {
+          filter: drop-shadow(0 0 ${15 + scrollProgress * 20}px rgba(255, 215, 0, ${0.3 + scrollProgress * 0.5}));
+        }
       `}} />
       
-      <div className="absolute top-0 right-0 z-3 hidden md:block">
-        <Image
-          src="/hand2.svg"
-          alt=""
-          width={450}
-          height={396}
-          priority
-        />
+      {/* Top Right Hand */}
+      <div 
+        className="absolute top-0 right-0 z-10 hidden md:block pointer-events-none"
+        style={{ transform: topHandTransform }}
+      >
+        <div className={`hand-animated ${scrollProgress > 0.3 ? 'hand-glow' : ''}`}>
+          <img
+            src="/hand2.svg"
+            alt=""
+            width={450}
+            height={426}
+            style={{ width: '450px', height: '426px' }}
+          />
+        </div>
       </div>
       
       <section className="bg-[#610035] text-white px-8 py-16 md:py-24 md:px-12 relative overflow-hidden">
         <div className="md:max-w-7xl lg:max-w-[100rem] mx-auto grid md:grid-cols-2 gap-12">
           {/* Left content */}
-          <div className="z-10">
-            <h1 className="text-[5rem] leading-24">
-              Raising a Voice <br></br> for Fair Policies
+          <div className="z-10 relative">
+            <h1 className="text-4xl md:text-[5rem] xl:text-[5.5rem] font-medium font-sans">
+              Raising a Voice <br /> for Fair Policies
             </h1>
-            <p className="text-2xl leading-relaxed py-4 text-white max-w-2xl">
+            <p className="text-lg md:text-2xl leading-relaxed py-4 font-medium text-white max-w-5xl">
               This is a Migrant Rights Movement calling on the government and political parties to change their views.
               Migrants who entered the UK lawfully, paying the required fees and holding valid visas, contribute to the
               economy by paying taxes, renting properties, buying groceries, and not claiming any benefits. Any unfair
@@ -58,28 +95,32 @@ export function Hero() {
           
           {/* Right decorative element with Hand 1 SVG */}
           <div className="hidden md:flex justify-center relative">
-            <div className="relative w-full h-full my-20 ml-60 flex items-center">
-              {/* Hand 1 SVG */}
-              <Image
-                src="/hand1.svg"
-                alt=""
-                width={422}
-                height={365}
-                className="opacity-80"
-                priority
-              />
+            <div 
+              className="relative w-full h-full my-20 ml-60 flex items-center"
+              style={{ transform: bottomHandTransform }}
+            >
+              <div className={`hand-animated ${scrollProgress > 0.3 ? 'hand-glow' : ''}`}>
+                <img
+                  src="/hand1.svg"
+                  alt=""
+                  width={422}
+                  height={435}
+                  className="opacity-80"
+                  style={{ width: '422px', height: '435px' }}
+                />
+              </div>
             </div>
           </div>
         </div>
         
         {/* Full-width nav that breaks out of section padding */}
         <div className="-mx-8 md:-mx-12 mt-8 md:mt-12">
-          <Image
+          <img
             src="/line1.svg"
             alt="Right for Migrants"
             width={1920}
             height={4}
-            className="w-full"
+            style={{ width: '100%', height: 'auto' }}
           />
           
           <div className="xl:max-w-full max-w-7xl my-4 mx-auto overflow-hidden">
@@ -106,12 +147,12 @@ export function Hero() {
             </div>
           </div>
           
-          <Image
+          <img
             src="/line2.svg"
             alt="Right for Migrants"
             width={1920}
             height={4}
-            className="w-full"
+            style={{ width: '100%', height: 'auto' }}
           />
         </div>
       </section>

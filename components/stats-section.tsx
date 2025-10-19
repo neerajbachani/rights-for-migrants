@@ -13,7 +13,7 @@ export function StatsSection() {
       outline: 'bg-[#FFFDFE] text-[#610035]'
     };
     return (
-      <span className={`px-10 py-4 rounded-[10px] text-3xl font-medium whitespace-nowrap flex-shrink-0 ${variants[variant]}`}>
+      <span className={`px-10 py-4 rounded-[10px] text-3xl font-medium font-sans whitespace-nowrap flex-shrink-0 ${variants[variant]}`}>
         {children}
       </span>
     );

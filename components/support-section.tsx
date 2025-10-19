@@ -17,8 +17,8 @@ export function SupportSection() {
     <section className=" mt-40 px-8 py-16 md:py-24 md:px-12">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className=" text-4xl md:text-7xl xl:text-[5rem] font-medium text-[#610035] mb-8">Support Our Movement</h2>
-          <p className="text-black max-w-4xl text-2xl leading-relaxed mx-auto mb-14">
+          <h2 className=" text-4xl md:text-7xl xl:text-[5rem] font-medium font-sans text-[#610035] mb-8">Support Our Movement</h2>
+          <p className="text-black max-w-4xl text-2xl leading-relaxed font-sans mx-auto mb-14">
             Raise awareness and show solidarity! Download a selection of profile logos and graphics — designed for social
             media and messaging apps.
           </p>
