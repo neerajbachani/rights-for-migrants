@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro} from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/components/LenisProvider";
+import { AuthProvider } from "@/lib/contexts/AuthContext";
+import { ImagesProvider } from "@/lib/contexts/ImagesContext";
 
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -26,9 +28,13 @@ export default function RootLayout({
       <body
         className={`${beVietnamPro.variable} bg-background text-foreground`}
       >
-        <LenisProvider>
-          {children}
-        </LenisProvider>
+        <AuthProvider>
+          <ImagesProvider>
+            <LenisProvider>
+              {children}
+            </LenisProvider>
+          </ImagesProvider>
+        </AuthProvider>
       </body>
     </html>
   );
