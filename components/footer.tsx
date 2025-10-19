@@ -26,10 +26,10 @@ export function Footer() {
           <div className="bg-[#610035] flex-1 h-[2px]" />
         </div>
         
-        <p className="font-medium text-lg md:text-[2rem] text-[#610035] leading-relaxed">
+        <p className="text-lg md:text-[2rem] font-medium font-sans  text-[#610035] leading-relaxed">
           contact@rightsformigrants.co.uk
         </p>
-        <p className="text-sm text-black leading-relaxed -mt-6">
+        <p className="text-sm text-black fomnt-medium font-sans leading-relaxed -mt-6">
           Rights for Migrants © 2025 | Design @ Agnes Creative
         </p>
       </div>

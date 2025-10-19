@@ -2,9 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowRight, X, CheckCircle, AlertCircle } from "lucide-react";
-import { useSubmitForm } from "@/lib/hooks/useSubmitForm";
-import { validateFormSubmission } from "@/lib/utils/formValidation";
-import { FormValidationError } from "@/lib/types/form";
 
 export function CTASection() {
   const ctaRef = useRef<HTMLDivElement | null>(null);
@@ -26,10 +23,10 @@ export function CTASection() {
     message: "",
     consent: false,
   });
-  const [validationErrors, setValidationErrors] = useState<FormValidationError[]>([]);
+  const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
-  const { submitForm, isLoading, error, isSuccess, reset } = useSubmitForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // -------------------------
   // Load GSAP + ScrollTrigger dynamically and initialize animations
@@ -71,22 +68,16 @@ export function CTASection() {
 
     loadScripts()
       .then(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const gsap = (window as any).gsap;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const ScrollTrigger = (window as any).ScrollTrigger;
         if (!gsap || !ScrollTrigger) return;
 
         gsap.registerPlugin(ScrollTrigger);
 
         if (!ctaRef.current || !headingRef.current || !buttonRef.current || !statsRef.current || !counterRef.current) {
-          // nothing to animate if refs are missing
           return;
         }
 
-        // timeline that triggers when CTA is in view
         gsapTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: ctaRef.current,
@@ -96,14 +87,12 @@ export function CTASection() {
           },
         });
 
-        // CTA slide in
         gsapTimeline.fromTo(
           ctaRef.current,
           { x: -200, opacity: 0 },
           { x: 0, opacity: 1, duration: 1.2, ease: "power3.out" }
         );
 
-        // heading
         gsapTimeline.fromTo(
           headingRef.current,
           { x: -100, opacity: 0 },
@@ -111,7 +100,6 @@ export function CTASection() {
           "-=0.8"
         );
 
-        // button with scale
         gsapTimeline.fromTo(
           buttonRef.current,
           { scale: 0, opacity: 0 },
@@ -119,7 +107,6 @@ export function CTASection() {
           "-=0.4"
         );
 
-        // stats slide up
         gsapTimeline.fromTo(
           statsRef.current,
           { y: 50, opacity: 0 },
@@ -127,7 +114,6 @@ export function CTASection() {
           "-=0.3"
         );
 
-        // counter animation that triggers when counter visible
         const counter = { value: 0 };
         scrollTriggerCounterAnim = gsap.to(counter, {
           value: 2178,
@@ -145,7 +131,6 @@ export function CTASection() {
           },
         });
 
-        // button hover animations
         const btn = buttonRef.current;
         if (btn) {
           btnMouseEnter = () => {
@@ -164,10 +149,7 @@ export function CTASection() {
       });
 
     return () => {
-      // cleanup GSAP animations and ScrollTriggers
       try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         const gsap = (window as any).gsap;
         if (gsap && gsapTimeline && gsapTimeline.kill) {
           gsapTimeline.kill();
@@ -175,7 +157,6 @@ export function CTASection() {
         if (scrollTriggerCounterAnim && scrollTriggerCounterAnim.kill) {
           scrollTriggerCounterAnim.kill();
         }
-        // Also kill all ScrollTriggers if available
         if ((window as any).ScrollTrigger && (window as any).ScrollTrigger.kill) {
           try {
             (window as any).ScrollTrigger.getAll?.().forEach((st: any) => st.kill && st.kill());
@@ -187,20 +168,18 @@ export function CTASection() {
         // ignore
       }
 
-      // remove event listeners from button
       if (buttonRef.current) {
         if (btnMouseEnter) buttonRef.current.removeEventListener("mouseenter", btnMouseEnter);
         if (btnMouseLeave) buttonRef.current.removeEventListener("mouseleave", btnMouseLeave);
       }
 
-      // remove scripts
       if (scriptGsap && document.head.contains(scriptGsap)) document.head.removeChild(scriptGsap);
       if (scriptScrollTrigger && document.head.contains(scriptScrollTrigger)) document.head.removeChild(scriptScrollTrigger);
     };
-  }, []); // run once on mount
+  }, []);
 
   // -------------------------
-  // Modal animation on open (uses already-loaded gsap if present)
+  // Modal animation on open
   // -------------------------
   useEffect(() => {
     if ((window as any).gsap && isModalOpen && modalRef.current && modalOverlayRef.current) {
@@ -223,12 +202,11 @@ export function CTASection() {
         duration: 0.3,
         ease: "power2.in",
         onComplete: () => {
-          // close & reset once animation completes
           setIsModalOpen(false);
           setFormData({ name: "", email: "", phone: "", address: "", nationality: "", visaStatus: "", message: "", consent: false });
           setValidationErrors([]);
           setShowSuccessMessage(false);
-          reset();
+          setError("");
         },
       });
     } else {
@@ -236,7 +214,7 @@ export function CTASection() {
       setFormData({ name: "", email: "", phone: "", address: "", nationality: "", visaStatus: "", message: "", consent: false });
       setValidationErrors([]);
       setShowSuccessMessage(false);
-      reset();
+      setError("");
     }
   };
 
@@ -247,27 +225,35 @@ export function CTASection() {
     e.preventDefault();
 
     setValidationErrors([]);
+    setError("");
 
-    const validation = validateFormSubmission(formData);
-    if (!validation.isValid) {
-      setValidationErrors(validation.errors);
+    // Basic validation
+    const errors: any[] = [];
+    if (!formData.name.trim()) errors.push({ field: "name", message: "Name is required" });
+    if (!formData.phone.trim()) errors.push({ field: "phone", message: "Phone is required" });
+    if (!formData.address.trim()) errors.push({ field: "address", message: "Address is required" });
+    if (!formData.nationality.trim()) errors.push({ field: "nationality", message: "Nationality is required" });
+    if (!formData.visaStatus) errors.push({ field: "visaStatus", message: "Visa status is required" });
+    if (!formData.consent) errors.push({ field: "consent", message: "You must agree to continue" });
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
       return;
     }
 
-    try {
-      await submitForm(formData);
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
       setShowSuccessMessage(true);
       setFormData({ name: "", email: "", phone: "", address: "", nationality: "", visaStatus: "", message: "", consent: false });
 
       setTimeout(() => {
         setShowSuccessMessage(false);
         closeModal();
-        reset();
       }, 2000);
-    } catch (err) {
-      // hook handles error display; keep console for debugging
-      console.error("Form submission error:", err);
-    }
+    }, 1500);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -318,7 +304,7 @@ export function CTASection() {
           </div>
 
           <div ref={statsRef} className="w-full mt-10 sm:mt-12">
-            <div className="max-w-2xl sm:max-w-4xl mx-auto px-6 sm:px-12 text-center">
+            <div className="max-w-2xl sm:max-w-6xl mx-auto px-6 sm:px-12 text-center">
               <h2
                 ref={counterRef}
                 className="text-6xl sm:text-8xl md:text-9xl font-sans leading-relaxed font-medium text-[#610035]"
@@ -326,8 +312,8 @@ export function CTASection() {
                 0
               </h2>
 
-              <p className="text-2xl sm:text-4xl md:text-6xl -mt-4 sm:-mt-8 md:-mt-16 text-[#610035] text-center sm:text-left leading-snug md:leading-relaxed font-medium font-besley">
-                people have joined the <br className="hidden sm:block" /> movement!
+              <p className="text-2xl sm:text-4xl  md:text-6xl -mt-4 sm:-mt-8 md:-mt-16 xl:-mt-8 text-[#610035] text-center sm:text-left leading-snug md:leading-relaxed font-medium font-besley">
+                people have joined the movement!
               </p>
             </div>
           </div>
@@ -336,7 +322,7 @@ export function CTASection() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
           {/* Overlay */}
           <div
             ref={modalOverlayRef}
@@ -347,44 +333,44 @@ export function CTASection() {
           {/* Modal content */}
           <div
             ref={modalRef}
-            className="relative bg-[#FFD03D] rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-12 max-w-lg sm:max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="relative bg-[#FFD03D] rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-4xl w-full shadow-2xl max-h-[95vh] flex flex-col"
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-[#610035] text-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-[#610035]/90 transition-colors"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-[#610035] text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-[#610035]/90 transition-colors z-10"
             >
-              <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <div className="mt-4">
-              <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium text-[#610035] mb-4 sm:mb-6">
+            <div className="overflow-y-auto p-6 flex-1">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-medium text-[#610035] mb-2 pr-10">
                 Welcome to the Movement
               </h2>
 
-              <p className="text-base sm:text-xl md:text-2xl text-[#610035]/80 mb-6 sm:mb-8">
-                Join thousands of people making a difference. Fill out the details below to get started.
+              <p className="text-sm sm:text-base md:text-lg text-[#610035]/80 mb-4">
+                Join thousands of people making a difference.
               </p>
 
               {/* Success Message */}
               {showSuccessMessage && (
-                <div className="mb-6 p-4 bg-green-100 border border-green-400 rounded-xl flex items-center gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                  <p className="text-green-800 font-medium">Thank you for joining the movement! We'll be in touch soon.</p>
+                <div className="mb-3 p-3 bg-green-100 border border-green-400 rounded-xl flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <p className="text-green-800 font-medium text-sm">Thank you for joining! We'll be in touch soon.</p>
                 </div>
               )}
 
               {/* Error Message */}
               {error && !showSuccessMessage && (
-                <div className="mb-6 p-4 bg-red-100 border border-red-400 rounded-xl flex items-center gap-3">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
-                  <p className="text-red-800 font-medium">{error}</p>
+                <div className="mb-3 p-3 bg-red-100 border border-red-400 rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-red-800 font-medium text-sm">{error}</p>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-lg font-medium text-[#610035] mb-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-[#610035] mb-1">
                       Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -392,39 +378,37 @@ export function CTASection() {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
                         getFieldError("name") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
                       }`}
                       placeholder="Enter your name"
                       disabled={isLoading}
                       type="text"
                     />
-                    {getFieldError("name") && <p className="mt-2 text-red-600 text-sm">{getFieldError("name")}</p>}
+                    {getFieldError("name") && <p className="mt-1 text-red-600 text-xs">{getFieldError("name")}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-lg font-medium text-[#610035] mb-2">
-                      Email Address <span className="text-gray-500 text-sm">(Optional)</span>
+                    <label htmlFor="email" className="block text-sm font-medium text-[#610035] mb-1">
+                      Email <span className="text-gray-500 text-xs">(Optional)</span>
                     </label>
                     <input
                       id="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
                         getFieldError("email") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
                       }`}
                       placeholder="Enter your email"
                       disabled={isLoading}
                       type="email"
                     />
-                    {getFieldError("email") && <p className="mt-2 text-red-600 text-sm">{getFieldError("email")}</p>}
+                    {getFieldError("email") && <p className="mt-1 text-red-600 text-xs">{getFieldError("email")}</p>}
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="phone" className="block text-lg font-medium text-[#610035] mb-2">
+                    <label htmlFor="phone" className="block text-sm font-medium text-[#610035] mb-1">
                       Phone Number <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -432,18 +416,39 @@ export function CTASection() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
                         getFieldError("phone") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
                       }`}
-                      placeholder="Enter your phone number"
+                      placeholder="Enter phone number"
                       disabled={isLoading}
                       type="tel"
                     />
-                    {getFieldError("phone") && <p className="mt-2 text-red-600 text-sm">{getFieldError("phone")}</p>}
+                    {getFieldError("phone") && <p className="mt-1 text-red-600 text-xs">{getFieldError("phone")}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-[#610035] mb-1">
+                      Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
+                        getFieldError("address") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
+                      }`}
+                      placeholder="Enter your address"
+                      disabled={isLoading}
+                      type="text"
+                    />
+                    {getFieldError("address") && <p className="mt-1 text-red-600 text-xs">{getFieldError("address")}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="nationality" className="block text-lg font-medium text-[#610035] mb-2">
+                    <label htmlFor="nationality" className="block text-sm font-medium text-[#610035] mb-1">
                       Nationality <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -451,120 +456,103 @@ export function CTASection() {
                       name="nationality"
                       value={formData.nationality}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
                         getFieldError("nationality") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
                       }`}
-                      placeholder="Enter your nationality"
+                      placeholder="Enter nationality"
                       disabled={isLoading}
                       type="text"
                     />
-                    {getFieldError("nationality") && <p className="mt-2 text-red-600 text-sm">{getFieldError("nationality")}</p>}
+                    {getFieldError("nationality") && <p className="mt-1 text-red-600 text-xs">{getFieldError("nationality")}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="visaStatus" className="block text-sm font-medium text-[#610035] mb-1">
+                      Visa Status <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="visaStatus"
+                      name="visaStatus"
+                      value={formData.visaStatus}
+                      onChange={handleInputChange}
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm ${
+                        getFieldError("visaStatus") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
+                      }`}
+                      disabled={isLoading}
+                    >
+                      <option value="">Select visa status</option>
+                      <option value="Citizen">Citizen</option>
+                      <option value="Permanent Resident">Permanent Resident</option>
+                      <option value="Work Visa">Work Visa</option>
+                      <option value="Student Visa">Student Visa</option>
+                      <option value="Tourist Visa">Tourist Visa</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    {getFieldError("visaStatus") && <p className="mt-1 text-red-600 text-xs">{getFieldError("visaStatus")}</p>}
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-[#610035] mb-1">
+                      Why join? <span className="text-gray-500 text-xs">(Optional)</span>
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      rows={2}
+                      className={`w-full px-3 py-2 rounded-lg border-2 focus:outline-none text-sm resize-none ${
+                        getFieldError("message") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
+                      }`}
+                      placeholder="Tell us your story..."
+                      disabled={isLoading}
+                    />
+                    {getFieldError("message") && <p className="mt-1 text-red-600 text-xs">{getFieldError("message")}</p>}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-lg font-medium text-[#610035] mb-2">
-                    Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
-                      getFieldError("address") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
-                    }`}
-                    placeholder="Enter your address"
-                    disabled={isLoading}
-                    type="text"
-                  />
-                  {getFieldError("address") && <p className="mt-2 text-red-600 text-sm">{getFieldError("address")}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="visaStatus" className="block text-lg font-medium text-[#610035] mb-2">
-                    Visa Status <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="visaStatus"
-                    name="visaStatus"
-                    value={formData.visaStatus}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg ${
-                      getFieldError("visaStatus") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
-                    }`}
-                    disabled={isLoading}
-                  >
-                    <option value="">Select your visa status</option>
-                    <option value="Citizen">Citizen</option>
-                    <option value="Permanent Resident">Permanent Resident</option>
-                    <option value="Work Visa">Work Visa</option>
-                    <option value="Student Visa">Student Visa</option>
-                    <option value="Tourist Visa">Tourist Visa</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  {getFieldError("visaStatus") && <p className="mt-2 text-red-600 text-sm">{getFieldError("visaStatus")}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-lg font-medium text-[#610035] mb-2">
-                    Why do you want to join? <span className="text-gray-500 text-sm">(Optional)</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className={`w-full px-4 py-3 rounded-xl border-2 focus:outline-none text-lg resize-none ${
-                      getFieldError("message") ? "border-red-400 focus:border-red-500" : "border-[#610035]/20 focus:border-[#610035]"
-                    }`}
-                    placeholder="Tell us your story..."
-                    disabled={isLoading}
-                  />
-                  {getFieldError("message") && <p className="mt-2 text-red-600 text-sm">{getFieldError("message")}</p>}
-                </div>
-
-                <div>
-                  <label className="flex items-start space-x-3 cursor-pointer">
+                  <label className="flex items-start space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
                       name="consent"
                       checked={formData.consent}
                       onChange={handleCheckboxChange}
                       disabled={isLoading}
-                      className={`mt-1 h-5 w-5 rounded border-2 text-[#610035] focus:ring-[#610035] ${
+                      className={`mt-0.5 h-4 w-4 rounded border-2 text-[#610035] focus:ring-[#610035] flex-shrink-0 ${
                         getFieldError("consent") ? "border-red-400" : "border-[#610035]/20"
                       }`}
                     />
-                    <span className="text-sm text-[#610035]">
-                      I agree to the terms and conditions and consent to the collection and processing of my personal information for the purpose of joining this movement. <span className="text-red-500">*</span>
+                    <span className="text-xs text-[#610035]">
+                      I agree to the terms and conditions and consent to the collection and processing of my personal information. <span className="text-red-500">*</span>
                     </span>
                   </label>
-                  {getFieldError("consent") && <p className="mt-2 text-red-600 text-sm">{getFieldError("consent")}</p>}
+                  {getFieldError("consent") && <p className="mt-1 text-red-600 text-xs">{getFieldError("consent")}</p>}
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading || showSuccessMessage}
-                  className={`w-full py-4 rounded-xl text-xl font-medium transition-colors flex items-center justify-center gap-3 ${
+                  className={`w-full py-2.5 rounded-xl text-base font-medium transition-colors flex items-center justify-center gap-2 ${
                     isLoading || showSuccessMessage ? "bg-[#610035]/50 cursor-not-allowed" : "bg-[#610035] hover:bg-[#610035]/90"
                   } text-white`}
                 >
                   {isLoading ? (
                     <>
-                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Submitting...
                     </>
                   ) : showSuccessMessage ? (
                     <>
-                      <CheckCircle className="w-6 h-6" />
+                      <CheckCircle className="w-5 h-5" />
                       Submitted!
                     </>
                   ) : (
                     <>
                       Submit
-                      <ArrowRight className="w-6 h-6" />
+                      <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>

@@ -49,6 +49,7 @@ export interface ExportFilters {
   status?: string;
   dateFrom?: string;
   dateTo?: string;
+  ids?: string[];
 }
 
 export interface PaginationInfo {

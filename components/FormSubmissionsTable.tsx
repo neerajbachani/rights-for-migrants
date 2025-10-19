@@ -6,6 +6,7 @@ import { useFormSubmissions } from "@/lib/hooks/admin/useFormSubmissions";
 import { useUpdateSubmissionStatus } from "@/lib/hooks/admin/useUpdateSubmissionStatus";
 import { useDeleteSubmission } from "@/lib/hooks/admin/useDeleteSubmission";
 import { useBulkOperations } from "@/lib/hooks/admin/useBulkOperations";
+import { useExportSubmissions } from "@/lib/hooks/admin/useExportSubmissions";
 import { formatDate } from "@/lib/utils";
 import LoadingSpinner from "./LoadingSpinner";
 import FormSubmissionDetail from "./FormSubmissionDetail";
@@ -58,6 +59,7 @@ export default function FormSubmissionsTable({
     bulkUpdateStatus,
     isLoading: isBulkLoading,
   } = useBulkOperations();
+  const { exportSubmissions, isLoading: isExporting } = useExportSubmissions();
 
   // Sort submissions client-side
   const sortedSubmissions = [...submissions].sort((a, b) => {
@@ -159,6 +161,14 @@ export default function FormSubmissionsTable({
       setIsSelectionMode(false);
     } catch (error) {
       console.error("Failed to bulk update status:", error);
+    }
+  };
+
+  const handleBulkExport = async (submissionIds: string[]) => {
+    try {
+      await exportSubmissions({ ids: submissionIds });
+    } catch (error) {
+      console.error("Failed to export selected submissions:", error);
     }
   };
 
@@ -410,7 +420,8 @@ export default function FormSubmissionsTable({
           onBulkStatusUpdate={(status: FormSubmissionStatus) =>
             handleBulkStatusUpdate(Array.from(selectedSubmissions), status)
           }
-          isLoading={isBulkLoading}
+          onBulkExport={() => handleBulkExport(Array.from(selectedSubmissions))}
+          isLoading={isBulkLoading || isExporting}
         />
       )}
 
@@ -602,7 +613,9 @@ export default function FormSubmissionsTable({
                         {submission.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {submission.email || <span className="text-gray-400 italic">N/A</span>}
+                        {submission.email || (
+                          <span className="text-gray-400 italic">N/A</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {submission.phone}

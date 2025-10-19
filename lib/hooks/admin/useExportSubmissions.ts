@@ -18,6 +18,9 @@ export function useExportSubmissions(): UseExportSubmissionsReturn {
       if (filters.status) searchParams.append('status', filters.status);
       if (filters.dateFrom) searchParams.append('dateFrom', filters.dateFrom);
       if (filters.dateTo) searchParams.append('dateTo', filters.dateTo);
+      if (filters.ids && filters.ids.length > 0) {
+        filters.ids.forEach(id => searchParams.append('ids', id));
+      }
 
       const response = await fetch(`/api/admin/forms/export?${searchParams.toString()}`, {
         method: 'GET',

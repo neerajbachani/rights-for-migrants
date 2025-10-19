@@ -186,8 +186,8 @@ export function Hero() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const bottomHandTransform = `translateY(-${scrollProgress * 300}px)`;
-  const topHandTransform = `translateY(${scrollProgress * 100}px)`;
+  const bottomHandTransform = `translateY(-${scrollProgress * 50}px)`;
+  const topHandTransform = `translateY(${scrollProgress * 20}px)`;
 
   return (
     <>
@@ -242,7 +242,7 @@ export function Hero() {
             <h1 className="text-[2.2rem] sm:text-3xl md:text-[4rem] xl:text-[5.5rem] font-medium font-besley leading-tight">
   Raising a Voice <br className="hidden sm:block" /> for Fair Policies
 </h1>
-            <p className="text-sm sm:text-lg md:text-xl xl:text-2xl leading-relaxed py-4 font-medium text-white max-w-5xl mx-auto md:mx-0">
+            <p className="text-sm sm:text-lg md:text-xl xl:text-2xl leading-relaxed py-4 font-medium font-sans text-white max-w-5xl mx-auto md:mx-0">
               This is a Migrant Rights Movement calling on the government and political parties
               to change their views. Migrants who entered the UK lawfully, paying the required fees
               and holding valid visas, contribute to the economy by paying taxes, renting

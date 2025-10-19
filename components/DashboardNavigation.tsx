@@ -61,18 +61,18 @@ export default function DashboardNavigation({
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white shadow-sm ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center">
+          <div className="flex gap-8 items-center">
             <div className="flex-shrink-0">
               <Image 
-                src="/logo.png" 
+                src="/logo-footer.svg" 
                 alt="Rights for Migrants" 
                 width={120} 
-                height={56}
-                className="h-8 w-auto"
+                height={106}
+                // className="h-40 w-auto"
               />
             </div>
             <div className="hidden md:block ml-6">
