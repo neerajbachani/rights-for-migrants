@@ -21,9 +21,7 @@ export function useExportSubmissions(): UseExportSubmissionsReturn {
 
       const response = await fetch(`/api/admin/forms/export?${searchParams.toString()}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {

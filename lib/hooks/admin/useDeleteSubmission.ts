@@ -16,9 +16,7 @@ export function useDeleteSubmission(): UseDeleteSubmissionReturn {
     mutationFn: async (id: string): Promise<void> => {
       const response = await fetch(`/api/admin/forms/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {

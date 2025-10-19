@@ -12,6 +12,9 @@ interface DashboardLayoutProps {
   isLoading?: boolean;
   error?: string | null;
   actions?: ReactNode;
+  currentSection?: string;
+  onSectionChange?: (section: string) => void;
+  newSubmissionsCount?: number;
 }
 
 export default function DashboardLayout({
@@ -20,16 +23,23 @@ export default function DashboardLayout({
   subtitle,
   isLoading = false,
   error = null,
-  actions
+  actions,
+  currentSection: externalCurrentSection,
+  onSectionChange: externalOnSectionChange,
+  newSubmissionsCount = 0
 }: DashboardLayoutProps) {
-  const [currentSection, setCurrentSection] = useState('images');
+  const [internalCurrentSection, setInternalCurrentSection] = useState('images');
+  
+  const currentSection = externalCurrentSection ?? internalCurrentSection;
+  const onSectionChange = externalOnSectionChange ?? setInternalCurrentSection;
 
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
         <DashboardNavigation 
           currentSection={currentSection}
-          onSectionChange={setCurrentSection}
+          onSectionChange={onSectionChange}
+          newSubmissionsCount={newSubmissionsCount}
         />
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
@@ -69,7 +79,8 @@ export default function DashboardLayout({
       <div className="min-h-screen bg-gray-50">
         <DashboardNavigation 
           currentSection={currentSection}
-          onSectionChange={setCurrentSection}
+          onSectionChange={onSectionChange}
+          newSubmissionsCount={newSubmissionsCount}
         />
         
         {/* Page Header */}

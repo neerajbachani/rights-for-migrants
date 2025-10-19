@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useImages } from '@/lib/contexts/ImagesContext';
+import { useFormSubmissions } from '@/lib/hooks/admin/useFormSubmissions';
+import { useExportSubmissions } from '@/lib/hooks/admin/useExportSubmissions';
 import AdminRoute from '@/components/AdminRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import ImageGallery from '@/components/ImageGallery';
@@ -10,11 +12,20 @@ import ImageUploadModal from '@/components/ImageUploadModal';
 import ImageEditModal from '@/components/ImageEditModal';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import BulkDeleteConfirmationDialog from '@/components/BulkDeleteConfirmationDialog';
+import FormSubmissionsTable from '@/components/FormSubmissionsTable';
 import { SocialMediaImage } from '@/lib/types/image';
 
 function DashboardContent() {
   const { user } = useAuth();
   const { images, uploadNewImage, updateImageData, deleteImageById, bulkDeleteImagesByIds } = useImages();
+  
+  // Section management
+  const [currentSection, setCurrentSection] = useState('images');
+  
+  // Form submissions data
+  const { submissions: allSubmissions } = useFormSubmissions({ limit: 1000 }); // Get all to count new ones
+  const newSubmissionsCount = allSubmissions.filter(submission => submission.status === 'new').length;
+  const { exportSubmissions, isLoading: isExporting } = useExportSubmissions();
   
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -138,6 +149,22 @@ function DashboardContent() {
     });
   };
 
+  // Handle form submissions export
+  const handleExportSubmissions = async () => {
+    try {
+      await exportSubmissions();
+      setFeedback({
+        type: 'success',
+        message: 'Form submissions exported successfully'
+      });
+    } catch (error) {
+      setFeedback({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to export submissions'
+      });
+    }
+  };
+
   // Handle edit save
   const handleEditSave = async (imageId: string, updates: Partial<SocialMediaImage>) => {
     console.log('Image updated successfully:', imageId, updates);
@@ -179,10 +206,34 @@ function DashboardContent() {
     }
   });
 
+  // Get section-specific title and subtitle
+  const getSectionTitle = () => {
+    switch (currentSection) {
+      case 'forms':
+        return 'Form Submissions';
+      case 'images':
+      default:
+        return 'Image Management';
+    }
+  };
+
+  const getSectionSubtitle = () => {
+    switch (currentSection) {
+      case 'forms':
+        return `Manage contact form submissions • ${newSubmissionsCount} new`;
+      case 'images':
+      default:
+        return `Welcome back, ${user?.email}`;
+    }
+  };
+
   return (
     <DashboardLayout
-      title="Image Management"
-      subtitle={`Welcome back, ${user?.email}`}
+      title={getSectionTitle()}
+      subtitle={getSectionSubtitle()}
+      currentSection={currentSection}
+      onSectionChange={setCurrentSection}
+      newSubmissionsCount={newSubmissionsCount}
     >
       {/* Feedback Toast */}
       {feedback && (
@@ -237,14 +288,20 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Main Gallery */}
+      {/* Main Content */}
       <div className="bg-white shadow rounded-lg p-6">
-        <ImageGallery
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onBulkDelete={handleBulkDelete}
-          onUpload={handleUpload}
-        />
+        {currentSection === 'images' ? (
+          <ImageGallery
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onBulkDelete={handleBulkDelete}
+            onUpload={handleUpload}
+          />
+        ) : currentSection === 'forms' ? (
+          <FormSubmissionsTable
+            onExport={handleExportSubmissions}
+          />
+        ) : null}
       </div>
 
       {/* Upload Modal */}

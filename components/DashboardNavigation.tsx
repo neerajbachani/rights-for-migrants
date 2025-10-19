@@ -7,11 +7,13 @@ import { useState } from 'react';
 interface DashboardNavigationProps {
   currentSection?: string;
   onSectionChange?: (section: string) => void;
+  newSubmissionsCount?: number;
 }
 
 export default function DashboardNavigation({ 
   currentSection = 'images', 
-  onSectionChange 
+  onSectionChange,
+  newSubmissionsCount = 0
 }: DashboardNavigationProps) {
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -41,6 +43,20 @@ export default function DashboardNavigation({
           />
         </svg>
       )
+    },
+    {
+      id: 'forms',
+      label: 'Form Submissions',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+      )
     }
   ];
 
@@ -65,7 +81,7 @@ export default function DashboardNavigation({
                   <button
                     key={item.id}
                     onClick={() => onSectionChange?.(item.id)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${
+                    className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors relative ${
                       currentSection === item.id
                         ? 'bg-[#610035] text-white'
                         : 'text-gray-600 hover:text-[#610035] hover:bg-gray-50'
@@ -73,6 +89,11 @@ export default function DashboardNavigation({
                   >
                     {item.icon}
                     <span>{item.label}</span>
+                    {item.id === 'forms' && newSubmissionsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                        {newSubmissionsCount > 99 ? '99+' : newSubmissionsCount}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -129,7 +150,7 @@ export default function DashboardNavigation({
               <button
                 key={item.id}
                 onClick={() => onSectionChange?.(item.id)}
-                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${
+                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors relative ${
                   currentSection === item.id
                     ? 'bg-[#610035] text-white'
                     : 'text-gray-600 hover:text-[#610035] hover:bg-gray-50'
@@ -137,6 +158,11 @@ export default function DashboardNavigation({
               >
                 {item.icon}
                 <span className="hidden sm:inline">{item.label}</span>
+                {item.id === 'forms' && newSubmissionsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                    {newSubmissionsCount > 99 ? '99+' : newSubmissionsCount}
+                  </span>
+                )}
               </button>
             ))}
           </div>

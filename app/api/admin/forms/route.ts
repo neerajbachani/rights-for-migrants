@@ -14,16 +14,16 @@ const getFormsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify JWT authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Verify JWT authentication - get token from cookie
+    const token = request.cookies.get('auth-token')?.value;
+    
+    if (!token) {
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.substring(7);
     const decoded = await verifyToken(token);
     if (!decoded) {
       return NextResponse.json(

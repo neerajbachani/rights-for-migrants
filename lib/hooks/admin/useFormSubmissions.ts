@@ -35,9 +35,7 @@ export function useFormSubmissions(params: UseFormSubmissionsParams = {}): UseFo
       if (dateTo) searchParams.append('dateTo', dateTo);
 
       const response = await fetch(`/api/admin/forms?${searchParams.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {

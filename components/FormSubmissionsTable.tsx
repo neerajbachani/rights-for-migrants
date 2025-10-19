@@ -1,96 +1,91 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { FormSubmission, FormSubmissionStatus } from '@/lib/types/form';
-import { useFormSubmissions } from '@/lib/hooks/admin/useFormSubmissions';
-import { useUpdateSubmissionStatus } from '@/lib/hooks/admin/useUpdateSubmissionStatus';
-import { useDeleteSubmission } from '@/lib/hooks/admin/useDeleteSubmission';
-import { useBulkOperations } from '@/lib/hooks/admin/useBulkOperations';
-import { formatDate } from '@/lib/utils';
-import LoadingSpinner from './LoadingSpinner';
-import FormSubmissionDetail from './FormSubmissionDetail';
-import BulkOperationsBar from './BulkOperationsBar';
-import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import { useState } from "react";
+import { FormSubmission, FormSubmissionStatus } from "@/lib/types/form";
+import { useFormSubmissions } from "@/lib/hooks/admin/useFormSubmissions";
+import { useUpdateSubmissionStatus } from "@/lib/hooks/admin/useUpdateSubmissionStatus";
+import { useDeleteSubmission } from "@/lib/hooks/admin/useDeleteSubmission";
+import { useBulkOperations } from "@/lib/hooks/admin/useBulkOperations";
+import { formatDate } from "@/lib/utils";
+import LoadingSpinner from "./LoadingSpinner";
+import FormSubmissionDetail from "./FormSubmissionDetail";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import BulkOperationsBar from "@/components/BulkOperationsBar";
 
 interface FormSubmissionsTableProps {
   onExport?: () => void;
 }
 
-type SortField = 'submittedAt' | 'name' | 'email' | 'status';
-type SortDirection = 'asc' | 'desc';
-
-export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableProps) {
+export default function FormSubmissionsTable({
+  onExport,
+}: FormSubmissionsTableProps) {
   // State for pagination and filtering
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [dateFromFilter, setDateFromFilter] = useState<string>('');
-  const [dateToFilter, setDateToFilter] = useState<string>('');
-  
-  // State for sorting
-  const [sortField, setSortField] = useState<SortField>('submittedAt');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  
-  // State for selection
-  const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(new Set());
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [dateFromFilter, setDateFromFilter] = useState<string>("");
+  const [dateToFilter, setDateToFilter] = useState<string>("");
+  const [sortBy, setSortBy] = useState<
+    "submittedAt" | "name" | "email" | "status"
+  >("submittedAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // State for selection and modals
+  const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(
+    new Set()
+  );
   const [isSelectionMode, setIsSelectionMode] = useState(false);
-  
-  // State for modals
-  const [detailSubmission, setDetailSubmission] = useState<FormSubmission | null>(null);
-  const [deleteSubmission, setDeleteSubmission] = useState<FormSubmission | null>(null);
+  const [detailSubmission, setDetailSubmission] =
+    useState<FormSubmission | null>(null);
+  const [deleteSubmission, setDeleteSubmission] =
+    useState<FormSubmission | null>(null);
 
   // Hooks
-  const { 
-    submissions, 
-    isLoading, 
-    error, 
-    pagination, 
-    refetch 
-  } = useFormSubmissions({
-    page: currentPage,
-    limit: pageSize,
-    status: statusFilter || undefined,
-    dateFrom: dateFromFilter || undefined,
-    dateTo: dateToFilter || undefined,
-  });
+  const { submissions, isLoading, error, pagination, refetch } =
+    useFormSubmissions({
+      page: currentPage,
+      limit: pageSize,
+      status: statusFilter || undefined,
+      dateFrom: dateFromFilter || undefined,
+      dateTo: dateToFilter || undefined,
+    });
 
   const { updateStatus, isLoading: isUpdating } = useUpdateSubmissionStatus();
-  const { deleteSubmission: deleteSubmissionMutation, isLoading: isDeleting } = useDeleteSubmission();
-  const { bulkDelete, bulkUpdateStatus, isLoading: isBulkLoading } = useBulkOperations();
+  const { deleteSubmission: performDelete, isLoading: isDeleting } =
+    useDeleteSubmission();
+  const {
+    bulkDelete,
+    bulkUpdateStatus,
+    isLoading: isBulkLoading,
+  } = useBulkOperations();
 
   // Sort submissions client-side
-  const sortedSubmissions = useMemo(() => {
-    if (!submissions.length) return [];
-    
-    return [...submissions].sort((a, b) => {
-      let aValue: any = a[sortField];
-      let bValue: any = b[sortField];
-      
-      // Handle date sorting
-      if (sortField === 'submittedAt') {
-        aValue = new Date(aValue).getTime();
-        bValue = new Date(bValue).getTime();
-      }
-      
-      // Handle string sorting
-      if (typeof aValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
-      
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [submissions, sortField, sortDirection]);
+  const sortedSubmissions = [...submissions].sort((a, b) => {
+    let aValue: any = a[sortBy];
+    let bValue: any = b[sortBy];
+
+    if (sortBy === "submittedAt") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    } else if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
+  });
 
   // Handle sorting
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  const handleSort = (column: typeof sortBy) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      setSortField(field);
-      setSortDirection('desc');
+      setSortBy(column);
+      setSortOrder("desc");
     }
   };
 
@@ -109,25 +104,38 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
     if (selectedSubmissions.size === sortedSubmissions.length) {
       setSelectedSubmissions(new Set());
     } else {
-      setSelectedSubmissions(new Set(sortedSubmissions.map(s => s.id)));
+      setSelectedSubmissions(new Set(sortedSubmissions.map((s) => s.id)));
     }
   };
 
   // Handle actions
-  const handleStatusUpdate = async (id: string, status: FormSubmissionStatus) => {
+  const isValidStatus = (status: string): status is FormSubmissionStatus => {
+    return ["new", "read", "archived"].includes(status);
+  };
+
+  const handleStatusUpdate = async (
+    id: string,
+    status: FormSubmissionStatus
+  ) => {
     try {
       await updateStatus(id, status);
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  const handleStatusChange = (id: string, value: string) => {
+    if (isValidStatus(value)) {
+      handleStatusUpdate(id, value);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteSubmissionMutation(id);
+      await performDelete(id);
       setDeleteSubmission(null);
     } catch (error) {
-      console.error('Failed to delete submission:', error);
+      console.error("Failed to delete submission:", error);
     }
   };
 
@@ -135,28 +143,23 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
     try {
       await bulkDelete(submissionIds);
       setSelectedSubmissions(new Set());
+      setIsSelectionMode(false);
     } catch (error) {
-      console.error('Failed to bulk delete:', error);
+      console.error("Failed to bulk delete:", error);
     }
   };
 
-  const handleBulkStatusUpdate = async (submissionIds: string[], status: FormSubmissionStatus) => {
+  const handleBulkStatusUpdate = async (
+    submissionIds: string[],
+    status: FormSubmissionStatus
+  ) => {
     try {
       await bulkUpdateStatus(submissionIds, status);
       setSelectedSubmissions(new Set());
+      setIsSelectionMode(false);
     } catch (error) {
-      console.error('Failed to bulk update status:', error);
+      console.error("Failed to bulk update status:", error);
     }
-  };
-
-  // Handle pagination
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
   };
 
   // Handle filters
@@ -166,9 +169,9 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
   };
 
   const clearFilters = () => {
-    setStatusFilter('');
-    setDateFromFilter('');
-    setDateToFilter('');
+    setStatusFilter("");
+    setDateFromFilter("");
+    setDateToFilter("");
     setCurrentPage(1);
   };
 
@@ -185,19 +188,19 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
   // Get status badge color
   const getStatusBadgeColor = (status: FormSubmissionStatus) => {
     switch (status) {
-      case 'new':
-        return 'bg-blue-100 text-blue-800';
-      case 'read':
-        return 'bg-green-100 text-green-800';
-      case 'archived':
-        return 'bg-gray-100 text-gray-800';
+      case "new":
+        return "bg-blue-100 text-blue-800";
+      case "read":
+        return "bg-green-100 text-green-800";
+      case "archived":
+        return "bg-gray-100 text-gray-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // Loading state
-  if (isLoading && !submissions.length) {
+  if (isLoading && submissions.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
@@ -228,9 +231,7 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
             Error loading form submissions
           </h3>
         </div>
-        <div className="mt-2 text-sm text-red-700">
-          {error}
-        </div>
+        <div className="mt-2 text-sm text-red-700">{error}</div>
         <div className="mt-4">
           <button
             onClick={() => refetch()}
@@ -245,83 +246,21 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
 
   return (
     <div>
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              id="status-filter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#610035] focus:border-[#610035] text-sm"
-            >
-              <option value="">All Statuses</option>
-              <option value="new">New</option>
-              <option value="read">Read</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-          
-          <div>
-            <label htmlFor="date-from" className="block text-sm font-medium text-gray-700 mb-1">
-              From Date
-            </label>
-            <input
-              type="date"
-              id="date-from"
-              value={dateFromFilter}
-              onChange={(e) => setDateFromFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#610035] focus:border-[#610035] text-sm"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="date-to" className="block text-sm font-medium text-gray-700 mb-1">
-              To Date
-            </label>
-            <input
-              type="date"
-              id="date-to"
-              value={dateToFilter}
-              onChange={(e) => setDateToFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#610035] focus:border-[#610035] text-sm"
-            />
-          </div>
-          
-          <div className="flex items-end space-x-2">
-            <button
-              onClick={handleFilterChange}
-              className="px-4 py-2 bg-[#610035] text-white text-sm font-medium rounded-md hover:bg-[#4a0028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
-            >
-              Apply
-            </button>
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Table Header */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-lg font-medium text-gray-900">
             Form Submissions
           </h2>
           <p className="text-sm text-gray-500">
-            {isSelectionMode && selectedSubmissions.size > 0 
+            {isSelectionMode && selectedSubmissions.size > 0
               ? `${selectedSubmissions.size} of ${sortedSubmissions.length} selected`
-              : `${pagination.total} ${pagination.total === 1 ? 'submission' : 'submissions'} total`
-            }
+              : `${pagination.total} ${
+                  pagination.total === 1 ? "submission" : "submissions"
+                } total`}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           {isSelectionMode ? (
             <>
@@ -329,9 +268,11 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
                 onClick={handleSelectAll}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
               >
-                {selectedSubmissions.size === sortedSubmissions.length ? 'Deselect All' : 'Select All'}
+                {selectedSubmissions.size === sortedSubmissions.length
+                  ? "Deselect All"
+                  : "Select All"}
               </button>
-              
+
               <button
                 onClick={exitSelectionMode}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
@@ -362,7 +303,7 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
                   Select
                 </button>
               )}
-              
+
               {onExport && (
                 <button
                   onClick={onExport}
@@ -389,12 +330,86 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label
+              htmlFor="status-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Status
+            </label>
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#610035] focus:ring-[#610035] sm:text-sm"
+            >
+              <option value="">All Statuses</option>
+              <option value="new">New</option>
+              <option value="read">Read</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="date-from"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              From Date
+            </label>
+            <input
+              type="date"
+              id="date-from"
+              value={dateFromFilter}
+              onChange={(e) => setDateFromFilter(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#610035] focus:ring-[#610035] sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="date-to"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              To Date
+            </label>
+            <input
+              type="date"
+              id="date-to"
+              value={dateToFilter}
+              onChange={(e) => setDateToFilter(e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#610035] focus:ring-[#610035] sm:text-sm"
+            />
+          </div>
+
+          <div className="flex items-end space-x-2">
+            <button
+              onClick={handleFilterChange}
+              className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#610035] hover:bg-[#4a0028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
+            >
+              Apply
+            </button>
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Bulk Operations Bar */}
       {isSelectionMode && selectedSubmissions.size > 0 && (
         <BulkOperationsBar
           selectedCount={selectedSubmissions.size}
           onBulkDelete={() => handleBulkDelete(Array.from(selectedSubmissions))}
-          onBulkStatusUpdate={(status) => handleBulkStatusUpdate(Array.from(selectedSubmissions), status)}
+          onBulkStatusUpdate={(status: FormSubmissionStatus) =>
+            handleBulkStatusUpdate(Array.from(selectedSubmissions), status)
+          }
           isLoading={isBulkLoading}
         />
       )}
@@ -422,25 +437,14 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
           </h3>
           <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
             {statusFilter || dateFromFilter || dateToFilter
-              ? 'No submissions match your current filters. Try adjusting your search criteria.'
-              : 'Form submissions will appear here once users start submitting the contact form.'
-            }
+              ? "No submissions match your current filters. Try adjusting your search criteria."
+              : "Form submissions will appear here once users start submitting the contact form."}
           </p>
-          {(statusFilter || dateFromFilter || dateToFilter) && (
-            <div className="mt-6">
-              <button
-                onClick={clearFilters}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#610035] hover:bg-[#4a0028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#610035]"
-              >
-                Clear Filters
-              </button>
-            </div>
-          )}
         </div>
       ) : (
         <>
           {/* Table */}
-          <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -449,93 +453,119 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
                       <th className="px-6 py-3 text-left">
                         <input
                           type="checkbox"
-                          checked={selectedSubmissions.size === sortedSubmissions.length && sortedSubmissions.length > 0}
+                          checked={
+                            selectedSubmissions.size ===
+                              sortedSubmissions.length &&
+                            sortedSubmissions.length > 0
+                          }
                           onChange={handleSelectAll}
                           className="h-4 w-4 text-[#610035] focus:ring-[#610035] border-gray-300 rounded"
                         />
                       </th>
                     )}
-                    
-                    <th 
+                    <th
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleSort('submittedAt')}
+                      onClick={() => handleSort("submittedAt")}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Date</span>
-                        {sortField === 'submittedAt' && (
+                        {sortBy === "submittedAt" && (
                           <svg
-                            className={`h-4 w-4 ${sortDirection === 'asc' ? 'transform rotate-180' : ''}`}
+                            className={`h-4 w-4 ${
+                              sortOrder === "asc" ? "transform rotate-180" : ""
+                            }`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         )}
                       </div>
                     </th>
-                    
-                    <th 
+                    <th
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleSort('name')}
+                      onClick={() => handleSort("name")}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Name</span>
-                        {sortField === 'name' && (
+                        {sortBy === "name" && (
                           <svg
-                            className={`h-4 w-4 ${sortDirection === 'asc' ? 'transform rotate-180' : ''}`}
+                            className={`h-4 w-4 ${
+                              sortOrder === "asc" ? "transform rotate-180" : ""
+                            }`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         )}
                       </div>
                     </th>
-                    
-                    <th 
+                    <th
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleSort('email')}
+                      onClick={() => handleSort("email")}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Email</span>
-                        {sortField === 'email' && (
+                        {sortBy === "email" && (
                           <svg
-                            className={`h-4 w-4 ${sortDirection === 'asc' ? 'transform rotate-180' : ''}`}
+                            className={`h-4 w-4 ${
+                              sortOrder === "asc" ? "transform rotate-180" : ""
+                            }`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         )}
                       </div>
                     </th>
-                    
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Message
                     </th>
-                    
-                    <th 
+                    <th
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleSort('status')}
+                      onClick={() => handleSort("status")}
                     >
                       <div className="flex items-center space-x-1">
                         <span>Status</span>
-                        {sortField === 'status' && (
+                        {sortBy === "status" && (
                           <svg
-                            className={`h-4 w-4 ${sortDirection === 'asc' ? 'transform rotate-180' : ''}`}
+                            className={`h-4 w-4 ${
+                              sortOrder === "asc" ? "transform rotate-180" : ""
+                            }`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         )}
                       </div>
                     </th>
-                    
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
@@ -549,67 +579,66 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
                           <input
                             type="checkbox"
                             checked={selectedSubmissions.has(submission.id)}
-                            onChange={(e) => handleSubmissionSelect(submission.id, e.target.checked)}
+                            onChange={(e) =>
+                              handleSubmissionSelect(
+                                submission.id,
+                                e.target.checked
+                              )
+                            }
                             className="h-4 w-4 text-[#610035] focus:ring-[#610035] border-gray-300 rounded"
                           />
                         </td>
                       )}
-                      
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {formatDate(submission.submittedAt, true)}
                       </td>
-                      
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {submission.name}
                       </td>
-                      
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {submission.email}
                       </td>
-                      
                       <td className="px-6 py-4 text-sm text-gray-900">
                         <div className="max-w-xs truncate">
                           {submission.message}
                         </div>
                       </td>
-                      
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(submission.status)}`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                            submission.status as FormSubmissionStatus
+                          )}`}
+                        >
                           {submission.status}
                         </span>
                       </td>
-                      
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => setDetailSubmission(submission)}
-                            className="text-[#610035] hover:text-[#4a0028] focus:outline-none focus:underline"
+                            className="text-[#610035] hover:text-[#4a0028] font-medium"
                           >
                             View
                           </button>
-                          
-                          {!isSelectionMode && (
-                            <>
-                              <select
-                                value={submission.status}
-                                onChange={(e) => handleStatusUpdate(submission.id, e.target.value as FormSubmissionStatus)}
-                                disabled={isUpdating}
-                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#610035] focus:border-[#610035]"
-                              >
-                                <option value="new">New</option>
-                                <option value="read">Read</option>
-                                <option value="archived">Archived</option>
-                              </select>
-                              
-                              <button
-                                onClick={() => setDeleteSubmission(submission)}
-                                disabled={isDeleting}
-                                className="text-red-600 hover:text-red-900 focus:outline-none focus:underline"
-                              >
-                                Delete
-                              </button>
-                            </>
-                          )}
+                          <select
+                            value={submission.status}
+                            onChange={(e) =>
+                              handleStatusChange(submission.id, e.target.value)
+                            }
+                            disabled={isUpdating}
+                            className="text-xs border-gray-300 rounded focus:border-[#610035] focus:ring-[#610035]"
+                          >
+                            <option value="new">New</option>
+                            <option value="read">Read</option>
+                            <option value="archived">Archived</option>
+                          </select>
+                          <button
+                            onClick={() => setDeleteSubmission(submission)}
+                            disabled={isDeleting}
+                            className="text-red-600 hover:text-red-900 font-medium"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -621,87 +650,129 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6 rounded-lg border border-gray-200">
+            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg">
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
                   className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
-                  onClick={() => handlePageChange(Math.min(pagination.totalPages, currentPage + 1))}
+                  onClick={() =>
+                    setCurrentPage(
+                      Math.min(pagination.totalPages, currentPage + 1)
+                    )
+                  }
                   disabled={currentPage === pagination.totalPages}
                   className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
               </div>
-              
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div className="flex items-center space-x-2">
                   <p className="text-sm text-gray-700">
-                    Showing{' '}
-                    <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span>
-                    {' '}to{' '}
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * pageSize + 1}
+                    </span>{" "}
+                    to{" "}
                     <span className="font-medium">
                       {Math.min(currentPage * pageSize, pagination.total)}
-                    </span>
-                    {' '}of{' '}
-                    <span className="font-medium">{pagination.total}</span>
-                    {' '}results
+                    </span>{" "}
+                    of <span className="font-medium">{pagination.total}</span>{" "}
+                    results
                   </p>
-                  
                   <select
                     value={pageSize}
-                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                    className="ml-4 text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#610035] focus:border-[#610035]"
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="text-sm border-gray-300 rounded focus:border-[#610035] focus:ring-[#610035]"
                   >
                     <option value={10}>10 per page</option>
                     <option value={25}>25 per page</option>
                     <option value={50}>50 per page</option>
                   </select>
                 </div>
-                
                 <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
                     <button
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
                       disabled={currentPage === 1}
                       className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="sr-only">Previous</span>
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
                       </svg>
                     </button>
-                    
-                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                      const page = i + 1;
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            currentPage === page
-                              ? 'z-10 bg-[#610035] border-[#610035] text-white'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    })}
-                    
+
+                    {/* Page numbers */}
+                    {Array.from(
+                      { length: Math.min(5, pagination.totalPages) },
+                      (_, i) => {
+                        const pageNum =
+                          Math.max(
+                            1,
+                            Math.min(pagination.totalPages - 4, currentPage - 2)
+                          ) + i;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              currentPage === pageNum
+                                ? "z-10 bg-[#610035] border-[#610035] text-white"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      }
+                    )}
+
                     <button
-                      onClick={() => handlePageChange(Math.min(pagination.totalPages, currentPage + 1))}
+                      onClick={() =>
+                        setCurrentPage(
+                          Math.min(pagination.totalPages, currentPage + 1)
+                        )
+                      }
                       disabled={currentPage === pagination.totalPages}
                       className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="sr-only">Next</span>
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </button>
                   </nav>
@@ -721,7 +792,7 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
           onStatusUpdate={handleStatusUpdate}
           onDelete={(id) => {
             setDetailSubmission(null);
-            const submission = sortedSubmissions.find(s => s.id === id);
+            const submission = submissions.find((s) => s.id === id);
             if (submission) setDeleteSubmission(submission);
           }}
         />
@@ -729,10 +800,10 @@ export default function FormSubmissionsTable({ onExport }: FormSubmissionsTableP
 
       {deleteSubmission && (
         <DeleteConfirmationDialog
-          submission={deleteSubmission}
+          image={null}
           isOpen={!!deleteSubmission}
           onClose={() => setDeleteSubmission(null)}
-          onConfirm={handleDelete}
+          onConfirm={() => handleDelete(deleteSubmission.id)}
           isDeleting={isDeleting}
         />
       )}
