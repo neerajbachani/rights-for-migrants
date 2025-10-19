@@ -813,7 +813,7 @@ export default function FormSubmissionsTable({
           isOpen={!!detailSubmission}
           onClose={() => setDetailSubmission(null)}
           onStatusUpdate={handleStatusUpdate}
-          onDelete={(id) => {
+          onDelete={(id: string) => {
             setDetailSubmission(null);
             const submission = submissions.find((s) => s.id === id);
             if (submission) setDeleteSubmission(submission);
