@@ -58,8 +58,13 @@ export async function POST(request: NextRequest) {
       const formSubmission = await prisma.formSubmission.create({
         data: {
           name: sanitizedData.name,
-          email: sanitizedData.email,
-          message: sanitizedData.message,
+          email: sanitizedData.email || null,
+          phone: sanitizedData.phone,
+          address: sanitizedData.address,
+          nationality: sanitizedData.nationality,
+          visaStatus: sanitizedData.visaStatus,
+          message: sanitizedData.message || null,
+          consent: sanitizedData.consent,
           status: 'new',
           submittedAt: new Date(),
         }

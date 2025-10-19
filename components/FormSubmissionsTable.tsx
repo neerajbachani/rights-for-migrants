@@ -539,7 +539,13 @@ export default function FormSubmissionsTable({
                       </div>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Message
+                      Phone
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nationality
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Visa Status
                     </th>
                     <th
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
@@ -596,12 +602,16 @@ export default function FormSubmissionsTable({
                         {submission.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {submission.email}
+                        {submission.email || <span className="text-gray-400 italic">N/A</span>}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="max-w-xs truncate">
-                          {submission.message}
-                        </div>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {submission.phone}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {submission.nationality}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {submission.visaStatus}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

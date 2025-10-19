@@ -17,8 +17,13 @@ datasource db {
 model FormSubmission {
   id          String   @id @default(cuid())
   name        String
-  email       String
-  message     String
+  email       String?
+  phone       String
+  address     String
+  nationality String
+  visaStatus  String
+  message     String?
+  consent     Boolean  @default(false)
   status      String   @default("new") // "new", "read", "archived"
   submittedAt DateTime @default(now())
   createdAt   DateTime @default(now())

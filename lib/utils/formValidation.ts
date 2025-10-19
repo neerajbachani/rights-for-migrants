@@ -33,47 +33,116 @@ export function validateFormSubmission(data: any): FormValidationResult {
     });
   }
 
-  // Validate email
-  if (!data.email || typeof data.email !== 'string') {
+  // Validate email (optional)
+  if (data.email && typeof data.email === 'string') {
+    if (data.email.trim().length > 0) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(data.email.trim())) {
+        errors.push({
+          field: 'email',
+          message: 'Invalid email format'
+        });
+      } else if (data.email.trim().length > 255) {
+        errors.push({
+          field: 'email',
+          message: 'Email must be less than 255 characters'
+        });
+      }
+    }
+  }
+
+  // Validate phone
+  if (!data.phone || typeof data.phone !== 'string') {
     errors.push({
-      field: 'email',
-      message: 'Email is required'
+      field: 'phone',
+      message: 'Phone number is required'
     });
-  } else if (data.email.trim().length === 0) {
+  } else if (data.phone.trim().length === 0) {
     errors.push({
-      field: 'email',
-      message: 'Email cannot be empty'
+      field: 'phone',
+      message: 'Phone number cannot be empty'
     });
-  } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email.trim())) {
+  } else if (data.phone.trim().length > 20) {
+    errors.push({
+      field: 'phone',
+      message: 'Phone number must be less than 20 characters'
+    });
+  }
+
+  // Validate address
+  if (!data.address || typeof data.address !== 'string') {
+    errors.push({
+      field: 'address',
+      message: 'Address is required'
+    });
+  } else if (data.address.trim().length === 0) {
+    errors.push({
+      field: 'address',
+      message: 'Address cannot be empty'
+    });
+  } else if (data.address.trim().length > 500) {
+    errors.push({
+      field: 'address',
+      message: 'Address must be less than 500 characters'
+    });
+  }
+
+  // Validate nationality
+  if (!data.nationality || typeof data.nationality !== 'string') {
+    errors.push({
+      field: 'nationality',
+      message: 'Nationality is required'
+    });
+  } else if (data.nationality.trim().length === 0) {
+    errors.push({
+      field: 'nationality',
+      message: 'Nationality cannot be empty'
+    });
+  } else if (data.nationality.trim().length > 100) {
+    errors.push({
+      field: 'nationality',
+      message: 'Nationality must be less than 100 characters'
+    });
+  }
+
+  // Validate visa status
+  if (!data.visaStatus || typeof data.visaStatus !== 'string') {
+    errors.push({
+      field: 'visaStatus',
+      message: 'Visa status is required'
+    });
+  } else if (data.visaStatus.trim().length === 0) {
+    errors.push({
+      field: 'visaStatus',
+      message: 'Visa status cannot be empty'
+    });
+  } else if (data.visaStatus.trim().length > 100) {
+    errors.push({
+      field: 'visaStatus',
+      message: 'Visa status must be less than 100 characters'
+    });
+  }
+
+  // Validate message (optional)
+  if (data.message && typeof data.message === 'string') {
+    if (data.message.trim().length > 1000) {
       errors.push({
-        field: 'email',
-        message: 'Invalid email format'
-      });
-    } else if (data.email.trim().length > 255) {
-      errors.push({
-        field: 'email',
-        message: 'Email must be less than 255 characters'
+        field: 'message',
+        message: 'Message must be less than 1000 characters'
       });
     }
   }
 
-  // Validate message
-  if (!data.message || typeof data.message !== 'string') {
+  // Validate consent
+  if (typeof data.consent !== 'boolean') {
     errors.push({
-      field: 'message',
-      message: 'Message is required'
+      field: 'consent',
+      message: 'Consent must be a boolean value'
     });
-  } else if (data.message.trim().length === 0) {
+  } else if (data.consent !== true) {
     errors.push({
-      field: 'message',
-      message: 'Message cannot be empty'
-    });
-  } else if (data.message.trim().length > 1000) {
-    errors.push({
-      field: 'message',
-      message: 'Message must be less than 1000 characters'
+      field: 'consent',
+      message: 'You must agree to the terms and conditions'
     });
   }
 
@@ -89,8 +158,13 @@ export function validateFormSubmission(data: any): FormValidationResult {
 export function sanitizeFormInput(data: SubmitFormRequest): SubmitFormRequest {
   return {
     name: sanitizeString(data.name),
-    email: sanitizeString(data.email),
-    message: sanitizeString(data.message)
+    email: data.email ? sanitizeString(data.email) : undefined,
+    phone: sanitizeString(data.phone),
+    address: sanitizeString(data.address),
+    nationality: sanitizeString(data.nationality),
+    visaStatus: sanitizeString(data.visaStatus),
+    message: data.message ? sanitizeString(data.message) : undefined,
+    consent: Boolean(data.consent)
   };
 }
 

@@ -82,8 +82,13 @@ export async function GET(request: NextRequest) {
         second: '2-digit'
       }),
       'Name': submission.name,
-      'Email': submission.email,
-      'Message': submission.message,
+      'Email': submission.email || 'N/A',
+      'Phone': submission.phone,
+      'Address': submission.address,
+      'Nationality': submission.nationality,
+      'Visa Status': submission.visaStatus,
+      'Message': submission.message || 'N/A',
+      'Consent': submission.consent ? 'Yes' : 'No',
       'Status': submission.status.charAt(0).toUpperCase() + submission.status.slice(1)
     }));
 
@@ -96,7 +101,12 @@ export async function GET(request: NextRequest) {
       { wch: 20 }, // Date
       { wch: 25 }, // Name
       { wch: 30 }, // Email
+      { wch: 18 }, // Phone
+      { wch: 40 }, // Address
+      { wch: 20 }, // Nationality
+      { wch: 20 }, // Visa Status
       { wch: 50 }, // Message
+      { wch: 10 }, // Consent
       { wch: 12 }, // Status
     ];
     worksheet['!cols'] = columnWidths;

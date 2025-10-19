@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro} from "next/font/google";
+import { Montserrat, Besley } from "next/font/google";
 import "./globals.css";
 import LenisProvider from "@/components/LenisProvider";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
 import { ImagesProvider } from "@/lib/contexts/ImagesContext";
 import { QueryProvider } from "@/lib/contexts/QueryProvider";
 
-
-const beVietnamPro = Be_Vietnam_Pro({
+const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-be-vietnam-pro",
+  variable: "--font-montserrat",
 });
 
+const besley = Besley({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-besley",
+});
 
 export const metadata: Metadata = {
   title: "Right for Migrants",
@@ -27,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${beVietnamPro.variable} bg-background text-foreground`}
+        className={`${montserrat.variable} ${besley.variable} bg-background text-foreground`}
       >
         <QueryProvider>
           <AuthProvider>

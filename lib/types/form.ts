@@ -9,8 +9,13 @@ export type FormSubmissionStatus = 'new' | 'read' | 'archived';
 
 export interface SubmitFormRequest {
   name: string;
-  email: string;
-  message: string;
+  email?: string;
+  phone: string;
+  address: string;
+  nationality: string;
+  visaStatus: string;
+  message?: string;
+  consent: boolean;
 }
 
 export interface SubmitFormResponse {

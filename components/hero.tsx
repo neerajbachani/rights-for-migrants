@@ -239,10 +239,10 @@ export function Hero() {
         <div className="max-w-7xl lg:max-w-[100rem] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           {/* Left content */}
           <div className="z-10 relative text-center md:text-left flex flex-col justify-center">
-            <h1 className="text-2xl sm:text-3xl md:text-[4rem] xl:text-[5.5rem] font-medium font-sans leading-tight">
-              Raising a Voice <br className="hidden sm:block" /> for Fair Policies
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl xl:text-2xl leading-relaxed py-4 font-medium text-white max-w-5xl mx-auto md:mx-0">
+            <h1 className="text-[2.2rem] sm:text-3xl md:text-[4rem] xl:text-[5.5rem] font-medium font-besley leading-tight">
+  Raising a Voice <br className="hidden sm:block" /> for Fair Policies
+</h1>
+            <p className="text-sm sm:text-lg md:text-xl xl:text-2xl leading-relaxed py-4 font-medium text-white max-w-5xl mx-auto md:mx-0">
               This is a Migrant Rights Movement calling on the government and political parties
               to change their views. Migrants who entered the UK lawfully, paying the required fees
               and holding valid visas, contribute to the economy by paying taxes, renting

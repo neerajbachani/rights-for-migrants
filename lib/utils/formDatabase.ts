@@ -12,8 +12,13 @@ export class FormDatabase {
     return await prisma.formSubmission.create({
       data: {
         name: data.name,
-        email: data.email,
-        message: data.message,
+        email: data.email || null,
+        phone: data.phone,
+        address: data.address,
+        nationality: data.nationality,
+        visaStatus: data.visaStatus,
+        message: data.message || null,
+        consent: data.consent,
       },
     });
   }

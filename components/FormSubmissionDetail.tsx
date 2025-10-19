@@ -190,12 +190,61 @@ export default function FormSubmissionDetail({
                     Email
                   </label>
                   <div className="p-3 bg-gray-50 rounded-md border">
+                    {submission.email ? (
+                      <a
+                        href={`mailto:${submission.email}`}
+                        className="text-sm text-[#610035] hover:text-[#4a0028] hover:underline"
+                      >
+                        {submission.email}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-400 italic">Not provided</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
                     <a
-                      href={`mailto:${submission.email}`}
+                      href={`tel:${submission.phone}`}
                       className="text-sm text-[#610035] hover:text-[#4a0028] hover:underline"
                     >
-                      {submission.email}
+                      {submission.phone}
                     </a>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nationality
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
+                    <p className="text-sm text-gray-900">{submission.nationality}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Address
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
+                    <p className="text-sm text-gray-900">{submission.address}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Visa Status
+                  </label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
+                    <p className="text-sm text-gray-900">{submission.visaStatus}</p>
                   </div>
                 </div>
               </div>
@@ -206,9 +255,39 @@ export default function FormSubmissionDetail({
                   Message
                 </label>
                 <div className="p-4 bg-gray-50 rounded-md border min-h-32">
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap leading-relaxed">
-                    {submission.message}
-                  </p>
+                  {submission.message ? (
+                    <p className="text-sm text-gray-900 whitespace-pre-wrap leading-relaxed">
+                      {submission.message}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-gray-400 italic">No message provided</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Consent */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Consent Given
+                </label>
+                <div className="p-3 bg-gray-50 rounded-md border">
+                  <div className="flex items-center">
+                    {submission.consent ? (
+                      <>
+                        <svg className="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-sm text-gray-900">Yes, consent provided</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-5 w-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span className="text-sm text-gray-900">No consent</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 

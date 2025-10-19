@@ -76,7 +76,8 @@
 }
 
 @theme inline {
-   --font-sans: var(--font-be-vietnam-pro);
+  --font-sans: var(--font-montserrat);
+  --font-besley: var(--font-besley);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

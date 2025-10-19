@@ -16,7 +16,7 @@ import Image from "next/image";
 
 export function Header() {
   return (
-    <header className="bg-[#610035] py-4 px-6 md:py-8 md:px-12 lg:px-8 lg:py-8">
+    <header className="bg-[#610035] py-8 px-6 md:py-8 md:px-12 lg:px-8 lg:py-8">
       <div className="max-w-7xl lg:max-w-[100rem] mx-auto flex justify-center md:justify-start">
         <div className="w-[180px] sm:w-[200px] md:w-[230px] lg:w-auto">
           <Image
