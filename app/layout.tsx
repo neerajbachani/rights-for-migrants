@@ -4,6 +4,7 @@ import "./globals.css";
 import LenisProvider from "@/components/LenisProvider";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
 import { ImagesProvider } from "@/lib/contexts/ImagesContext";
+import { QueryProvider } from "@/lib/contexts/QueryProvider";
 
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -28,13 +29,15 @@ export default function RootLayout({
       <body
         className={`${beVietnamPro.variable} bg-background text-foreground`}
       >
-        <AuthProvider>
-          <ImagesProvider>
-            <LenisProvider>
-              {children}
-            </LenisProvider>
-          </ImagesProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <ImagesProvider>
+              <LenisProvider>
+                {children}
+              </LenisProvider>
+            </ImagesProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
