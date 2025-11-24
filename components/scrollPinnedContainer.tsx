@@ -1,4 +1,3 @@
-
 "use client";
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
@@ -6,125 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import StatsSection from "./stats-section";
 import QuotesSection from "./quotes-section";
 
-
 gsap.registerPlugin(ScrollTrigger);
-
-// export function ScrollPinnedContainer() {
-//   const wrapperRef = useRef<HTMLDivElement | null>(null);
-//   const statsRef = useRef<HTMLDivElement | null>(null);
-
-//   useLayoutEffect(() => {
-//     if (!wrapperRef.current || !statsRef.current) return;
-
-//     const ctx = gsap.context(() => {
-//       // All tracks now move SLOWLY with consistent speeds
-      
-//       // Track 1 - Moves right to left (slow and smooth)
-//       gsap.to(".track-1", {
-//         xPercent: -20,  // Reduced distance for slower movement
-//         ease: "none",
-//         scrollTrigger: {
-//           trigger: wrapperRef.current,
-//           start: "top bottom",
-//           end: "bottom top",
-//           scrub: 4,  // Much higher = much slower and smoother
-//           markers: false,
-//         },
-//       });
-//       // Track 2 - Moves left to right (slow and smooth)
-//       gsap.set(".track-2", { xPercent: -20 });  // Starts slightly left
-//       gsap.to(".track-2", {
-//         xPercent: 0,  // Reduced travel distance
-//         ease: "none",
-//         scrollTrigger: {
-//           trigger: wrapperRef.current,
-//           start: "top bottom",
-//           end: "bottom top",
-//           scrub: 4.5,  // Slower and smoother than track 1
-//           markers: false,
-//         },
-//       });
-//       // Track 3 - Moves right to left (slowest and smoothest)
-//       gsap.to(".track-3", {
-//         xPercent: -15,  // Reduced distance
-//         ease: "none",
-//         scrollTrigger: {
-//           trigger: wrapperRef.current,
-//           start: "top bottom",
-//           end: "bottom top",
-//           scrub: 5,  // Slowest and smoothest
-//           markers: false,
-//         },
-//       });
-
-//       // Pin the entire section during the quote animations
-//       ScrollTrigger.create({
-//         trigger: wrapperRef.current,
-//         start: "top top",
-//         end: "+=100%",
-//         pin: true,
-//         pinSpacing: true,
-//         markers: false,
-//       });
-
-//       // Quotes timeline
-//       const quotesTL = gsap.timeline({
-//         scrollTrigger: {
-//           trigger: wrapperRef.current,
-//           start: "top top",
-//           end: "+=200%",
-//           scrub: 0.5,
-//           markers: false,
-//         },
-//       });
-
-//       // Phase A: Quote1 appears and centers
-//       quotesTL.fromTo(
-//         ".quote-1",
-//         { autoAlpha: 0, y: 100, scale: 0.9 },
-//         { autoAlpha: 1, y: 0, scale: 1, duration: 1, ease: "power2.out" },
-//         0
-//       );
-
-//       // Hold quote1 centered
-//       quotesTL.to(".quote-1", { autoAlpha: 1, y: 0, duration: 1 }, 1);
-
-//       // Phase B: Move quote1 up and bring quote2 in
-//       quotesTL.to(".quote-1", { y: 300, autoAlpha: 0.8, duration: 1 }, 4);
-      
-//       quotesTL.fromTo(
-//         ".quote-2",
-//         { autoAlpha: 0, y: 150, scale: 0.9 },
-//         { autoAlpha: 1, y: -200, scale: 1, duration: 0.8 },
-//         1.8
-//       );
-
-//       // Phase C: Both continue moving up as scroll continues
-//       quotesTL.to([".quote-1", ".quote-2"], { 
-//         y: "120", 
-//         duration: 1.2, 
-//       }, 3);
-//     }, wrapperRef);
-
-//     return () => ctx.revert();
-//   }, []);
-
-//   return (
-//     <div className="">
-//       <div ref={wrapperRef} className="relative w-full">
-//         {/* Stats behind */}
-//         <div ref={statsRef} className="absolute inset-0 z-0 pointer-events-none">
-//           <StatsSection />
-//         </div>
-
-//         {/* Quotes overlayed */}
-//         <div className="relative z-10 pointer-events-auto min-h-screen flex items-center justify-center">
-//           <QuotesSection />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 export function ScrollPinnedContainer() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -134,7 +15,9 @@ export function ScrollPinnedContainer() {
     if (!wrapperRef.current || !statsRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Track animations remain slow and smooth
+      const mm = gsap.matchMedia();
+
+      // Track animations - common for all screens
       gsap.to(".track-1", {
         xPercent: -20,
         ease: "none",
@@ -172,67 +55,68 @@ export function ScrollPinnedContainer() {
         },
       });
 
-      // Pin the entire section - extended for 3 quotes
-      ScrollTrigger.create({
-        trigger: wrapperRef.current,
-        start: "top top",
-        end: "+=100%", // Extended for the third quote
-        pin: true,
-        pinSpacing: false,
-        markers: false,
-      });
-
-      // Quotes timeline with 3 quotes
-      const quotesTL = gsap.timeline({
-        scrollTrigger: {
+      mm.add({
+        // Desktop
+        isDesktop: "(min-width: 800px)",
+        // Mobile
+        isMobile: "(max-width: 799px)",
+      }, (context) => {
+        const { isMobile } = context.conditions as { isMobile: boolean };
+        
+        // Pin the entire section
+        // pinSpacing: true ensures the next section waits until we are done
+        ScrollTrigger.create({
           trigger: wrapperRef.current,
           start: "top top",
-          end: "+=100%", // Extended scroll range for 3 quotes
-          scrub: 0.5,
+          end: "+=300%", // Longer scroll distance for better pacing
+          pin: true,
+          pinSpacing: true, 
           markers: false,
-        },
+        });
+
+        const quotesTL = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrapperRef.current,
+            start: "top top",
+            end: "+=300%",
+            scrub: 1,
+            markers: false,
+          },
+        });
+
+        // Initial states for stacked quotes
+        // We start with all hidden or positioned
+        const yOffsetIn = isMobile ? 50 : 100;
+        const yOffsetOut = isMobile ? -50 : -100;
+
+        gsap.set([".quote-1", ".quote-2", ".quote-3"], { autoAlpha: 0, scale: 0.9, y: yOffsetIn });
+
+        // Sequence:
+        // 1. Quote 1 Enters
+        quotesTL.to(".quote-1", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" });
+        
+        // 2. Hold Quote 1
+        quotesTL.to(".quote-1", { duration: 1 });
+
+        // 3. Quote 1 Exits, Quote 2 Enters
+        quotesTL.to(".quote-1", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-2", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" }, "<+=0.2"); // Slight overlap
+
+        // 4. Hold Quote 2
+        quotesTL.to(".quote-2", { duration: 1 });
+
+        // 5. Quote 2 Exits, Quote 3 Enters
+        quotesTL.to(".quote-2", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" }, "<+=0.2");
+
+        // 6. Hold Quote 3
+        quotesTL.to(".quote-3", { duration: 1 });
+
+        // 7. Quote 3 Exits (optional, or just unpin)
+        // If we want it to fade out before unpinning:
+        quotesTL.to(".quote-3", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
       });
 
-      // Phase A: Quote 1 appears and centers
-      quotesTL.fromTo(
-        ".quote-1",
-        { autoAlpha: 0, y: 100, scale: 0.9 },
-        { autoAlpha: 1, y: 0, scale: 1, duration: 1, ease: "power2.out" },
-        0
-      );
-
-      // Hold quote 1 centered
-      quotesTL.to(".quote-1", { autoAlpha: 1, y: 250, duration: 1 }, 1);
-
-      // Phase B: Move quote 1 up and bring quote 2 in
-      quotesTL.to(".quote-1", { y: -50, autoAlpha: 0.8, duration: 1 }, 5);
-      
-      quotesTL.fromTo(
-        ".quote-2",
-        { autoAlpha: 0, y: 150, scale: 0.9 },
-        { autoAlpha: 1, y: -250, scale: 1, duration: 1 },
-        2.5
-      );
-
-      // Hold quote 2 centered
-      quotesTL.to(".quote-2", { autoAlpha: 1, y: -200, duration: 1 }, 3.5);
-
-      // Phase C: Move both quotes up and bring quote 3 in
-      quotesTL.to(".quote-1", { y: -200, autoAlpha: 0, duration: 1 }, 4.5);
-      quotesTL.to(".quote-2", { y: -400, autoAlpha: 0.9, duration: 1 }, 4.5);
-      
-      quotesTL.fromTo(
-        ".quote-3",
-        { autoAlpha: 0, y: 0, scale: 0.4 },
-        { autoAlpha: 1, y: -600, scale: 1, duration: 1 },
-        5
-      );
-
-      // Phase D: All three continue moving up as scroll continues
-      quotesTL.to([".quote-1", ".quote-2", ".quote-3"], { 
-        y: "-=300", 
-        duration: 1.5, 
-      }, 6);
     }, wrapperRef);
 
     return () => ctx.revert();

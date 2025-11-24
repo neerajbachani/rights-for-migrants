@@ -33,9 +33,9 @@ export function Header() {
           href="https://www.instagram.com/rightsformigrants_uk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-white hover:text-white/80 transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 mr-60 rounded-full backdrop-blur-sm"
+          className="flex items-center gap-2 text-white hover:text-white/80 transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 mr-0 md:mr-60 rounded-full backdrop-blur-sm"
         >
-          <span className="font-medium">Connect with us</span>
+          <span className="font-medium text-xs sm:text-lg">Connect with us</span>
           <Instagram className="w-5 h-5" />
         </Link>
       </div>
