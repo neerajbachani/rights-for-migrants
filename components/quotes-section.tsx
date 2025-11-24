@@ -40,7 +40,7 @@ export default function QuotesSection() {
             <span className="border-b-2 border-[#8F8F8F]">Legal Migrants have right to vote in the UK, with the power to determine the next leader or government.</span>
           </p>
         </div>
-        <div className="quote-3 col-start-1 row-start-1 bg-[#FF4122] p-8 sm:p-6 md:p-8 lg:p-12 xl:p-16 pt-10 sm:pt-8 md:pt-10 lg:pt-14 xl:pt-20 -rotate-[4deg] rounded-2xl md:rounded-3xl transform-gpu">
+        <div className="quote-3 col-start-1 row-start-1 bg-[#FF4122] p-8 sm:p-6 md:p-8 lg:p-12 xl:p-16 pt-10 sm:pt-8 md:pt-10 lg:pt-14 xl:pt-20 rotate-[3deg] rounded-2xl md:rounded-3xl transform-gpu">
           <p className="font-medium text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[2.5rem] text-white text-left leading-relaxed">
             <span className="border-b-2 border-[#8F8F8F]">You will not decide our future with your policies but we will decide your future with our Vote.</span>
           </p>

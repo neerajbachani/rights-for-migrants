@@ -99,14 +99,14 @@ export function ScrollPinnedContainer() {
         quotesTL.to(".quote-1", { duration: 1 });
 
         // 3. Quote 1 Exits, Quote 2 Enters
-        quotesTL.to(".quote-1", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-1", { autoAlpha: 0.8, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
         quotesTL.to(".quote-2", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" }, "<+=0.2"); // Slight overlap
 
         // 4. Hold Quote 2
         quotesTL.to(".quote-2", { duration: 1 });
 
         // 5. Quote 2 Exits, Quote 3 Enters
-        quotesTL.to(".quote-2", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-2", { autoAlpha: 0.9, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
         quotesTL.to(".quote-3", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" }, "<+=0.2");
 
         // 6. Hold Quote 3
@@ -114,7 +114,7 @@ export function ScrollPinnedContainer() {
 
         // 7. Quote 3 Exits (optional, or just unpin)
         // If we want it to fade out before unpinning:
-        quotesTL.to(".quote-3", { autoAlpha: 0, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
       });
 
     }, wrapperRef);
