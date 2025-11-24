@@ -5,10 +5,8 @@ export function Hero() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const items = [
-    "Equal Voices, Equal Rights",
-    "One Voice, One Movement",
-    "Empower Migrants Now",
-    "Hope. Rights. Action",
+    "We will respond with our Vote in next Election.",
+    "Our Vote Will Speak Louder than Words.",
   ];
 
   useEffect(() => {
@@ -73,7 +71,7 @@ export function Hero() {
         </div>
       </div>
 
-      <section className="bg-[#610035] text-white px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-24 relative overflow-hidden">
+      <section className="bg-[#610035] text-white px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-12 relative overflow-hidden">
         <div className="max-w-7xl lg:max-w-[100rem] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           {/* Left content */}
           <div className="z-10 relative text-center md:text-left flex flex-col justify-center">
@@ -81,16 +79,12 @@ export function Hero() {
   Raising a Voice <br className="hidden sm:block" /> for Fair Policies
 </h1>
             <p className="text-sm sm:text-lg md:text-xl xl:text-2xl leading-relaxed py-4 font-medium font-sans text-white max-w-5xl mx-auto md:mx-0">
-              This is a Migrant Rights Movement calling on the government and political parties
-              to change their views. Migrants who entered the UK lawfully, paying the required fees
-              and holding valid visas, contribute to the economy by paying taxes, renting
-              properties, buying groceries, and not claiming any benefits. Any unfair policies
-              will be answered with our vote in the next election.
+              This is a Migrant Rights Movement calling on the Government and Political Parties to change their views on Migrants who entered the UK lawfully.
             </p>
           </div>
 
           {/* Right hand - hidden on mobile */}
-          <div className="hidden md:flex justify-center items-center relative">
+          <div className="hidden md:flex justify-center items-center relative mt-44">
             <div
               className="relative flex items-center justify-center"
               style={{ transform: bottomHandTransform }}

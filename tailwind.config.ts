@@ -8,11 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
-    fontFamily: {
+      fontFamily: {
         sans: ["var(--font-be-vietnam-pro)", "sans-serif"],
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };
 export default config;

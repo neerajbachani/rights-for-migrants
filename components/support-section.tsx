@@ -65,7 +65,7 @@ export function SupportSection() {
           </h2>
 
           <p className="text-base sm:text-lg md:text-2xl max-w-3xl md:max-w-4xl mx-auto leading-relaxed font-medium font-sans mb-8">
-            Raise awareness and show solidarity! Download a selection of profile logos and graphics — designed for social
+            Raise awareness and show solidarity! Download a selection of profile logos — designed for social
             media and messaging apps.
           </p>
 
