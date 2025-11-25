@@ -68,7 +68,7 @@ export function ScrollPinnedContainer() {
         ScrollTrigger.create({
           trigger: wrapperRef.current,
           start: "top top",
-          end: "+=220%", // Longer scroll distance for better pacing
+          end: "+=300%", // Longer scroll distance for better pacing
           pin: true,
           pinSpacing: true, 
           markers: false,
@@ -131,7 +131,7 @@ export function ScrollPinnedContainer() {
         </div>
 
         {/* Quotes overlayed */}
-        <div className="relative z-10 pointer-events-auto min-h-[35vh] sm:min-h-[50vh] lg:min-h-screen flex items-center justify-center">
+        <div className="relative z-10 pointer-events-auto  min-h-screen flex items-center justify-center my-auto ">
           <QuotesSection />
         </div>
       </div>
