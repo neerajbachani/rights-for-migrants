@@ -79,7 +79,7 @@ export function ScrollPinnedContainer() {
             trigger: wrapperRef.current,
             start: "top top",
             end: "+=100%",
-            scrub: 2,
+            scrub: 1,
             markers: false,
           },
         });
