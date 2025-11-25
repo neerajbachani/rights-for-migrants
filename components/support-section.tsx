@@ -57,7 +57,7 @@ export function SupportSection() {
   };
 
   return (
-    <section className=" px-4 sm:px-6 md:px-12 py-12 md:py-0">
+    <section className=" mt-20 md:mt-0 px-4 sm:px-6 md:px-12 py-12 md:py-0">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-7xl xl:text-[5rem] font-medium text-[#610035] mb-4 sm:mb-6 md:mb-8 font-besley ">

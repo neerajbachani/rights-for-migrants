@@ -68,28 +68,28 @@ export function ScrollPinnedContainer() {
         ScrollTrigger.create({
           trigger: wrapperRef.current,
           start: "top top",
-          end: "+=300%", // Longer scroll distance for better pacing
+          end: "bottom 50%", // Longer scroll distance for better pacing
           pin: true,
           pinSpacing: true, 
-          markers: false,
+          markers: true,
         });
 
         const quotesTL = gsap.timeline({
           scrollTrigger: {
             trigger: wrapperRef.current,
             start: "top top",
-            end: "+=300%",
-            scrub: 1,
+            end: "+=50%",
+            scrub: 4,
             markers: false,
           },
         });
 
         // Initial states for stacked quotes
         // We start with all hidden or positioned
-        const yOffsetIn = isMobile ? 50 : 100;
-        const yOffsetOut = isMobile ? -50 : -100;
+        const yOffsetIn = isMobile ? 380 : 500;
+        const yOffsetOut = isMobile ? 200 : -200;
 
-        gsap.set([".quote-1", ".quote-2", ".quote-3"], { autoAlpha: 0, scale: 0.9, y: yOffsetIn });
+        gsap.set([".quote-1", ".quote-2", ".quote-3"], { autoAlpha: 0.7, scale: 0.9, y: yOffsetIn });
 
         // Sequence:
         // 1. Quote 1 Enters
@@ -107,14 +107,14 @@ export function ScrollPinnedContainer() {
 
         // 5. Quote 2 Exits, Quote 3 Enters
         quotesTL.to(".quote-2", { autoAlpha: 0.9, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
-        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" }, "<+=0.2");
+        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 1, y: 0, duration: 1, ease: "power2.out" });
 
         // 6. Hold Quote 3
         quotesTL.to(".quote-3", { duration: 1 });
 
         // 7. Quote 3 Exits (optional, or just unpin)
         // If we want it to fade out before unpinning:
-        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 0.9, y: yOffsetOut, duration: 1, ease: "power2.in" });
+        quotesTL.to(".quote-3", { autoAlpha: 1, scale: 0.9, y: yOffsetOut });
       });
 
     }, wrapperRef);
@@ -131,7 +131,7 @@ export function ScrollPinnedContainer() {
         </div>
 
         {/* Quotes overlayed */}
-        <div className="relative z-10 pointer-events-auto  min-h-screen flex items-center justify-center my-auto ">
+        <div className="relative z-10 pointer-events-auto h-[88vh] md:min-h-screen flex items-center justify-center my-auto ">
           <QuotesSection />
         </div>
       </div>
