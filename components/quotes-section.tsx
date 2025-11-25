@@ -25,7 +25,7 @@
 
 export default function QuotesSection() {
   return (
-    <section className="relative px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-24 min-h-screen flex items-center justify-center">
+    <section className="relative px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-24 flex items-center justify-center">
       <div className="max-w-3xl mx-auto relative z-10 text-center grid grid-cols-1 place-items-center">
         <div className="quote-1 col-start-1 row-start-1 bg-[#FFCA24] p-8 sm:p-6 md:p-8 lg:p-12 xl:p-16 pt-10 sm:pt-8 md:pt-10 lg:pt-14 xl:pt-20 rounded-2xl md:rounded-3xl -rotate-[3deg] transform-gpu">
           <p className="font-medium text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[2.5rem] text-black text-left leading-relaxed">

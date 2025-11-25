@@ -71,7 +71,7 @@ export function Hero() {
         </div>
       </div>
 
-      <section className="bg-[#610035] text-white px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-12 relative overflow-hidden">
+      <section className="bg-[#610035] text-white px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-16 md:py-12 relative overflow-hidden">
         <div className="max-w-7xl lg:max-w-[100rem] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           {/* Left content */}
           <div className="z-10 relative text-center md:text-left flex flex-col justify-center">

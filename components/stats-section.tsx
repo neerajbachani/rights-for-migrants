@@ -155,7 +155,7 @@ export default function StatsSection() {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden flex flex-col gap-8 sm:gap-12 md:gap-16 lg:gap-20 justify-center -mt-20 sm:-mt-28 md:-mt-32 lg:-mt-40">
+    <div className="min-h-[35vh] sm:min-h-[50vh] lg:min-h-screen overflow-hidden flex flex-col gap-8 sm:gap-12 md:gap-16 lg:gap-20 justify-center -mt-0 sm:-mt-0 md:-mt-32 lg:-mt-40">
       {/* Track 1 */}
       <div className="w-full skew-y-2 overflow-hidden my-3 sm:my-4 md:my-6 lg:my-8">
         <div className="track-1 flex gap-2 sm:gap-3 md:gap-4 lg:gap-5 w-fit will-change-transform">

@@ -278,7 +278,7 @@ export function CTASection() {
 
   return (
     <>
-      <section className="py-16 sm:py-20 w-full overflow-hidden min-h-[70vh] sm:min-h-screen flex items-center">
+      <section className="py-4 sm:py-20 w-full overflow-hidden min-h-[70vh] sm:min-h-screen flex items-center">
         <div className="w-full">
           <div className="md:mr-20 xl:mr-40">
             <div

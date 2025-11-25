@@ -1,17 +1,4 @@
-// import Image from "next/image";
 
-// export function Header() {
-//   return (
-//     <header className="bg-[#610035] md:py-8 lg:px-8 lg:py-8 md:px-12">
-     
-//       <div className="max-w-7xl lg:max-w-[100rem]  mx-auto">
-//         <div className="">
-//           <Image src="/logo.png" alt="Right for Migrants" width={257} height={120} objectFit="contain" />
-//         </div>
-//       </div>
-//     </header>
-//   )
-// }
 import Image from "next/image";
 import Link from "next/link";
 import { Instagram } from "lucide-react";
@@ -19,7 +6,7 @@ import { Instagram } from "lucide-react";
 export function Header() {
   return (
     <header className="bg-[#610035] py-8 px-6 md:py-8 md:px-12 lg:px-8 lg:py-8">
-      <div className="max-w-7xl lg:max-w-[100rem] mx-auto flex items-center justify-between">
+      <div className="max-w-7xl lg:max-w-[100rem] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
         <div className="w-[180px] sm:w-[200px] md:w-[230px] lg:w-auto">
           <Image
             src="/logo.png"
