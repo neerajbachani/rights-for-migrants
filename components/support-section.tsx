@@ -93,11 +93,19 @@ export function SupportSection() {
         )}
 
         {/* Responsive grid: 1 col mobile, 2 col small tablets, 3 col md+ (desktop unchanged) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 mb-16">
+        <div
+          className={`grid gap-6 sm:gap-8 md:gap-10 mb-16 ${
+            displayImages.length === 1
+              ? "grid-cols-1 place-items-center"
+              : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+          }`}
+        >
           {displayImages.map((image, index) => (
             <div
               key={image.id}
-              className="relative aspect-square rounded-[1.25rem] overflow-hidden flex items-center justify-center transition-transform duration-300 hover:scale-105"
+              className={`relative aspect-square rounded-[1.25rem] overflow-hidden flex items-center justify-center transition-transform duration-300 hover:scale-105 ${
+                displayImages.length === 1 ? "w-full sm:w-1/2 md:w-1/3" : ""
+              }`}
               onMouseEnter={() => setHoveredImage(image.id)}
               onMouseLeave={() => setHoveredImage(null)}
             >

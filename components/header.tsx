@@ -9,7 +9,7 @@ export function Header() {
       <div className="max-w-7xl lg:max-w-[100rem] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
         <div className="w-[180px] sm:w-[200px] md:w-[230px] lg:w-auto">
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="Right for Migrants"
             width={257}
             height={120}
