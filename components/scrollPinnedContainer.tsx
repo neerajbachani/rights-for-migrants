@@ -68,18 +68,18 @@ export function ScrollPinnedContainer() {
         ScrollTrigger.create({
           trigger: wrapperRef.current,
           start: "top top",
-          end: "bottom 50%", // Longer scroll distance for better pacing
+          end: "bottom 30%", // Longer scroll distance for better pacing
           pin: true,
           pinSpacing: true, 
-          markers: true,
+          markers: false,
         });
 
         const quotesTL = gsap.timeline({
           scrollTrigger: {
             trigger: wrapperRef.current,
             start: "top top",
-            end: "+=50%",
-            scrub: 4,
+            end: "+=100%",
+            scrub: 2,
             markers: false,
           },
         });
